@@ -14,10 +14,16 @@ jobs:
     - name: Descomprimir el proyecto
       run: unzip proyecto.zip
 
-    - name: Corregir clases duplicadas de Kotlin
+    - name: Corregir clases duplicadas y Activar MultiDex
       run: |
-        # Agrega las restricciones de dependencias directamente al build.gradle de la app antes de compilar
+        # Fuerza las dependencias modernas de Kotlin para evitar duplicados
         echo -e "\nconfigurations.all { resolutionStrategy.force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22', 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22', 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22' }" >> app/build.gradle
+        
+        # Activa MultiDex en el archivo build.gradle para romper el límite de métodos 64K
+        sed -i '/defaultConfig {/a \        multiDexEnabled true' app/build.gradle
+        
+        # Añade la librería de soporte MultiDex al final de las dependencias
+        sed -i '/dependencies {/a \    implementation "androidx.multidex:multidex:2.0.1"' app/build.gradle
 
     - name: set up JDK 17
       uses: actions/setup-java@v4
