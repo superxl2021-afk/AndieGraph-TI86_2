@@ -12,7 +12,12 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Descomprimir el proyecto
-      run: unzip proyecto.zip
+      run: unzip *.zip
+
+    - name: Parchear Código en C (ti8x.c)
+      run: |
+        # Inyecta las librerías estándar de C necesarias para clock_gettime, usleep y strcpy
+        sed -i '1s/^/#include <time.h>\n#include <unistd.h>\n#include <string.h>\n/' app/src/main/jni/ti8x.c
 
     - name: Corregir clases duplicadas y Activar MultiDex
       run: |
