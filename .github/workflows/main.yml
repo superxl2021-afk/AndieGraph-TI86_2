@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Descomprimir el proyecto
-      run: unzip proyecto.zip
+      run: unzip AndieGraph-main.zip
 
     - name: set up JDK 17
       uses: actions/setup-java@v4
