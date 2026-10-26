@@ -14,20 +14,19 @@ jobs:
     - name: Descomprimir el proyecto
       run: unzip *.zip
 
-    - name: Parchear Código en C (ti8x.c)
+    - name: Parchear Codigo en C e Inyectar Modo Turbo
       run: |
-        # Inyecta las librerías estándar de C necesarias para clock_gettime, usleep y strcpy
+        # Incluye las librerías estándar de C necesarias
         sed -i '1s/^/#include <time.h>\n#include <unistd.h>\n#include <string.h>\n/' app/src/main/jni/ti8x.c
+        
+        # Elimina el "freno" de velocidad (usleep) en el bucle principal del emulador para activar el Modo Turbo nativo
+        sed -i 's/usleep(periodUsec);//g' app/src/main/jni/ti8x.c
+        sed -i 's/usleep(1000);//g' app/src/main/jni/ti8x.c
 
     - name: Corregir clases duplicadas y Activar MultiDex
       run: |
-        # Fuerza las dependencias modernas de Kotlin para evitar duplicados
         echo -e "\nconfigurations.all { resolutionStrategy.force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22', 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22', 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22' }" >> app/build.gradle
-        
-        # Activa MultiDex en el archivo build.gradle para romper el límite de métodos 64K
         sed -i '/defaultConfig {/a \        multiDexEnabled true' app/build.gradle
-        
-        # Añade la librería de soporte MultiDex al final de las dependencias
         sed -i '/dependencies {/a \    implementation "androidx.multidex:multidex:2.0.1"' app/build.gradle
 
     - name: set up JDK 17
