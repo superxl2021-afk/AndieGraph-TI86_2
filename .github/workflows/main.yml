@@ -14,15 +14,9 @@ jobs:
     - name: Descomprimir el proyecto
       run: unzip *.zip
 
-    - name: Parchear Motor en C con Aceleración Dinámica (Modo Busy)
+    - name: Parchear Codigo en C
       run: |
-        # Incluye las librerías estándar de C necesarias
         sed -i '1s/^/#include <time.h>\n#include <unistd.h>\n#include <string.h>\n/' app/src/main/jni/ti8x.c
-        
-        # Parche inteligente: Solo acelera (sleep de 1 microsegundo) si la calculadora está ocupada ejecutando instrucciones.
-        # Si la calculadora está esperando una tecla (IDLE), mantiene el usleep original para evitar el auto-apagado.
-        sed -i 's/usleep(periodUsec);/if (CPU.IPPeriod > 0) { usleep(1); } else { usleep(periodUsec); }/g' app/src/main/jni/ti8x.c
-        sed -i 's/usleep(1000);/if (CPU.IPPeriod > 0) { usleep(1); } else { usleep(1000); }/g' app/src/main/jni/ti8x.c
 
     - name: Corregir clases duplicadas y Activar MultiDex
       run: |
